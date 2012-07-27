@@ -10,6 +10,7 @@ if(!defined('DBG_TEMP_FILE'))
     define('DBG_TEMP_FILE', '/' . sys_get_temp_dir() . '/phpdbg.tmp');
 
 define('DBG_SLEEP_PERIOD', 1);
+define('DBG_OUTPUT_PREFIX', '    ');
 
 class DbgContext {
 
@@ -70,16 +71,16 @@ class DbgContext {
 }
 
 function __dbg_list_code($dbgContext, $args) {
-    echo "\nFile:", $dbgContext->fileName, ":\n\n";
+    echo "\n", DBG_OUTPUT_PREFIX, "File:", $dbgContext->fileName, ":\n\n";
     $lines = file($dbgContext->fileName);
     $linesAround = (int) $args;
     if(! $linesAround)
         $linesAround = 7;
     for($i = 0; $i < sizeof($lines); $i++) {
         if($dbgContext->lineNumber - $linesAround <= $i && $i < $dbgContext->lineNumber + $linesAround) {
-            echo trim($i . ':' . $lines[$i]);
+            echo DBG_OUTPUT_PREFIX, trim($i . ':' . $lines[$i]);
             if($i == $dbgContext->lineNumber - 1)
-                echo "\n     ^-------------------------------------------------------------------------------- HERE YOU ARE !\n";
+                echo "\n", DBG_OUTPUT_PREFIX, "\t^-------------------------------------------------------------------------------- HERE YOU ARE !\n";
             else
                 echo "\n";
         }
@@ -91,11 +92,11 @@ function __dbg_print_expression($dbgContext, $args) {
     try {
         $evalResult = null;
         $evalExpression = preg_replace('/(\$)(\w+)/', '\$dbgContext->variables[\'$2\']', $args);
-        //echo "Evaluating expression:", $evalExpression, "\n";
+        //echo DBG_OUTPUT_PREFIX, "Evaluating expression:", $evalExpression, "\n";
         eval('$evalResult = ' . $evalExpression . ';');
-        echo "\n = ", print_r($evalResult, true), "\n";
+        echo "\n", DBG_OUTPUT_PREFIX, "= ", print_r($evalResult, true), "\n";
     } catch(Exception $e) {
-        echo "Invalid expression:", $args, "\n";
+        echo DBG_OUTPUT_PREFIX, "Invalid expression:", $args, "\n";
     }
 }
 
@@ -105,7 +106,7 @@ function __dbg_print_variables($dbgContext, $args) {
         $value = preg_replace('/\s+/', ' ', $value);
         if(strlen($value) > 80)
             $value = substr($value, 0, 80) . '...';
-        echo $key, ' = ', $value, "\n";
+        echo DBG_OUTPUT_PREFIX, $key, ' = ', $value, "\n";
     }
 }
 
@@ -118,17 +119,17 @@ function __dbg_print_backtrace($dbgContext, $args) {
         $function = @$backTraceElement['function'];
         $class = @$backTraceElement['class'];
         $functionArgs = @$backTraceElement['args'];
-        echo $file . '(' . $lineNumber . "):\n";
+        echo DBG_OUTPUT_PREFIX, $file . '(' . $lineNumber . "):\n";
         if($function)
-            echo "\tfunction: ", $function, "\n";
+            echo DBG_OUTPUT_PREFIX, "function: ", $function, "\n";
         if($class)
-            echo "\tclass: ", $class, "\n";
+            echo DBG_OUTPUT_PREFIX, "class: ", $class, "\n";
         if($functionArgs) {
             $functionArgs = str_replace("\n", ' ', print_r($functionArgs, true));
             $functionArgs = preg_replace('/\s+/', ' ', $functionArgs);
-            echo "\targs: ", $functionArgs, "\n";
+            echo DBG_OUTPUT_PREFIX, "args: ", $functionArgs, "\n";
         }
-        echo $file . '(' . $lineNumber . "):\n";
+        echo DBG_OUTPUT_PREFIX, $file . '(' . $lineNumber . "):\n";
     }
 }
 
@@ -177,7 +178,7 @@ function __inspect() {
         } else {
             foreach($commands as $commandItem) {
                 list($command, $function, $help) = $commandItem;
-                echo $command, $help, "\n";
+                echo DBG_OUTPUT_PREFIX, $command, $help, "\n";
             }
         }
     }
