@@ -8,5 +8,5 @@ while(true) {
     $executed = __inspect();
     if($executed)
         echo "Waiting for next debug...\n";
-    sleep(1);
+    usleep(200000);
 }
