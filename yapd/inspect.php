@@ -1,6 +1,6 @@
 <?
 
-require_once 'psi/dbg.php';
+require_once 'yapd/dbg.php';
 
 echo "Waiting for debug...\n";
 

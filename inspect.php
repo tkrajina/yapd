@@ -1,4 +1,4 @@
 #!/usr/bin/php
 <?
 
-include 'psi/inspect.php';
+include 'yapd/inspect.php';
