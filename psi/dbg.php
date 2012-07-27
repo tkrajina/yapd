@@ -9,12 +9,15 @@
 if(!defined('DBG_TEMP_FILE'))
     define('DBG_TEMP_FILE', '/' . sys_get_temp_dir() . '/phpdbg.tmp');
 
+define('DBG_SLEEP_PERIOD', 1);
+
 class DbgContext {
 
     public $fileName;
     public $lineNumber;
     public $variables;
     public $backTrace;
+    public $saved = 0;
 
     public function __construct($fileName, $lineNumber, $variables, $backTrace) {
         $this->fileName = $fileName;
@@ -24,8 +27,27 @@ class DbgContext {
     }
 
     public function save() {
+        $this->saved = mktime(false);
+
         $serialized = serialize($this);
         file_put_contents(DBG_TEMP_FILE, $serialized);
+    }
+
+    /**
+     * Refresh the "last changed" time of the file.
+     */
+    public function reload() {
+        $this->save();
+    }
+
+    public function isValid() {
+        if(!$this->exists())
+            return false;
+
+        if(mktime(false) - $this->saved > 5 * DBG_SLEEP_PERIOD)
+            return false;
+
+        return true;
     }
 
     public function exists() {
@@ -126,6 +148,12 @@ function __inspect() {
         return false;
     }
 
+    if(!$dbgContext->isValid()) {
+        echo "Found old dbg file, ignoring it\n";
+        $dbgContext->remove();
+        return false;
+    }
+
     $commands = array(
         array('l', '__dbg_list_code',           ' [n]          -> shows n lines of code around the current line'),
         array('p', '__dbg_print_expression',    ' <expression> -> evalates a simple php expression'),
@@ -173,7 +201,7 @@ function __dbg($vars) {
     $dbgContext->save();
 
     while($dbgContext->exists()) {
-        sleep(1);
+        sleep(DBG_SLEEP_PERIOD);
     }
 }
 
