@@ -10,14 +10,12 @@ Clone from the github repo.
 
 Edit your **/etc/php/php5/php.ini** and/or **/etc/php5/cli/php.ini** files and add the yamd folder to the **include_path** variable.
 
-And that's it.
-
 Debugging CLI scripts:
 ----------------------
 
-Go to the cloned folder, start **./inspect.php**. YAMD will start and wait for a debug point. Leave it as it started.
+Go to the cloned folder, start **./inspect.php**. YAMD will start and wait for a debug event.
 
-Create a new PHP script. Include yapd:
+Create a new PHP script. Include YAPD:
 
     require_once 'yapd/dbg.php';
 
@@ -25,13 +23,13 @@ Insert your debug points with:
 
     __dbg(get_defined_vars();
 
-Start the script, the **inspect.php** process should look like:
+Start the script, the **inspect.php** (we have started it earlier) process should now look like:
 
     $ ./inspect.php 
     Waiting for debug...
     ? 
 
-With CLI scripts you can debug without running **inspect.php** with the following code:
+With CLI scripts you can debug without running **inspect.php**. Just enter the following code:
 
     require_once 'yapd/dbg.php';
     __dbg_and_inspect(get_defined_vars());
@@ -41,7 +39,7 @@ Debugging web applications:
 
 Start **inspect.php**.
 
-Include yapd in your PHP scripts:
+Include YAPD in your PHP scripts:
 
     require_once 'yapd/dbg.php';
 
@@ -95,7 +93,7 @@ type **v** to have a quick list of all defined variables:
         _SERVER = Array ( [SSH_AGENT_PID] => 1687 [GPG_AGENT_INFO] => /tmp/keyring-RiA5Mc/gpg:0:1 ...
         a = 1
 
-Type **p** if you need eveluating simple PHP expressions:
+Type **p** if you want to evaluate variables or simple PHP expressions:
 
     ? p $a
 
@@ -114,7 +112,7 @@ Type **s** to see the actual stack trace of this debug point:
         function: test
         /home/puzz/projects/yapd/test_dbg.php(15):
 
-Or just **c** to continue to the next debug point (if there is any).
+Or just **c** to continue to the next debug point.
 
 License:
 --------
