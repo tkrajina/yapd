@@ -96,13 +96,10 @@ type **v** to have a quick list of all defined variables:
 Type **p** if you want to evaluate variables or simple PHP expressions:
 
     ? p $a
-
         = 1
     ? p $a * 10
-
         = 10
     ? p sqrt($a)
-
         = 1
 
 Type **s** to see the actual stack trace of this debug point:

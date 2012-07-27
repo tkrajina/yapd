@@ -94,7 +94,7 @@ function __dbg_print_expression($dbgContext, $args) {
         $evalExpression = preg_replace('/(\$)(\w+)/', '\$dbgContext->variables[\'$2\']', $args);
         //echo DBG_OUTPUT_PREFIX, "Evaluating expression:", $evalExpression, "\n";
         eval('$evalResult = ' . $evalExpression . ';');
-        echo "\n", DBG_OUTPUT_PREFIX, "= ", print_r($evalResult, true), "\n";
+        echo DBG_OUTPUT_PREFIX, "= ", print_r($evalResult, true), "\n";
     } catch(Exception $e) {
         echo DBG_OUTPUT_PREFIX, "Invalid expression:", $args, "\n";
     }
