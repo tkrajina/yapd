@@ -191,7 +191,10 @@ function __inspect() {
  * (executed from command line) should be invoked with __inspect (see 
  * inspect.php).
  */
-function __dbg($vars) {
+function __dbg($vars, $extended=null) {
+    if($extended && is_array($extended))
+        $vars = array_merge($vars, $extended);
+
     $backTrace = debug_backtrace();
     $backTraceElement = $backTrace[0];
     $file = $backTraceElement['file'];
