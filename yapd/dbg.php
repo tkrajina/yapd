@@ -19,6 +19,7 @@ class DbgContext {
     public $variables;
     public $backTrace;
     public $saved = 0;
+    public $execExpression;
 
     public function __construct($fileName, $lineNumber, $variables, $backTrace) {
         $this->fileName = $fileName;
@@ -37,7 +38,7 @@ class DbgContext {
     /**
      * Refresh the "last changed" time of the file.
      */
-    public function reload() {
+    public function refresh() {
         $this->save();
     }
 
@@ -133,6 +134,21 @@ function __dbg_print_backtrace($dbgContext, $args) {
     }
 }
 
+function __dbg_set_variable($dbgContext, $args) {
+    $matches = null;
+    preg_match_all('/^(\$\w[\w\d]*)\s+(.*)$/', $args, $matches);
+    if(!$matches) {
+        print "Invalid expression\n";
+        return;
+    }
+
+    $variableName = @$matches[1][0];
+    $expression = @$matches[2][0];
+
+    $dbgContext->execExpression = $variableName . '=' . $expression . ';';
+    $dbgContext->refresh();
+}
+
 function __dbg_continue($dbgContext, $args) {
     $dbgContext->remove();
 }
@@ -149,18 +165,23 @@ function __inspect() {
         return false;
     }
 
-    if(!$dbgContext->isValid()) {
-        echo "Found old dbg file, ignoring it\n";
-        $dbgContext->remove();
-        return false;
+    if($dbgContext->exists() && !$dbgContext->isValid()) {
+        $answer = @trim(@readline('Found old/unused dbg file, inspect it anyway? [y/N] '));
+        if(strtolower($answer) != 'y') {
+            $dbgContext->remove();
+            return false;
+        }
     }
 
     $commands = array(
-        array('l', '__dbg_list_code',           ' [n]          -> shows n lines of code around the current line'),
-        array('p', '__dbg_print_expression',    ' <expression> -> evalates a simple php expression'),
-        array('v', '__dbg_print_variables',     '              -> print all variables'),
-        array('s', '__dbg_print_backtrace',     '              -> print back trace'),
-        array('c', '__dbg_continue',            '              -> continues the execution'),
+        array('l', '__dbg_list_code',           ' [n]                -> shows n lines of code around the current line'),
+        array('p', '__dbg_print_expression',    ' <expression>       -> evalates a simple php expression'),
+        array('v', '__dbg_print_variables',     '                    -> print all variables'),
+        array('s', '__dbg_set_variable',        ' <var> <expression> -> set variable to new value. ' . "\n" .
+                                                '                            The new value will be in efect after you continue from this breakpoint. ' . "\n" .
+                                                '                            Note: this works only when debugging with eval(__dbg(get_defined_vars())). '),
+        array('b', '__dbg_print_backtrace',     '                    -> print back trace'),
+        array('c', '__dbg_continue',            '                    -> continues the execution'),
     );
 
     while($dbgContext->exists()) {
@@ -190,6 +211,9 @@ function __inspect() {
  * Sets a debug point and stops executing the script. Another php script 
  * (executed from command line) should be invoked with __inspect (see 
  * inspect.php).
+ * 
+ * Note, if you want to shange variable values you must use it like:
+ * eval(__dbg(get_defined_vars())).
  */
 function __dbg($vars, $extended=null) {
     if($extended && is_array($extended))
@@ -204,14 +228,26 @@ function __dbg($vars, $extended=null) {
 
     $dbgContext->save();
 
+    $execExpressions = array();
+
     while($dbgContext->exists()) {
+        $dbgContext = DbgContext::load();
+        if($dbgContext->execExpression) {
+            $execExpressions[] = 'try{'.$dbgContext->execExpression.';}catch(Exception $e) {echo "Error", $e->getMessage();}';
+            $dbgContext->execExpression = null;
+            $dbgContext->refresh();
+        }
         sleep(DBG_SLEEP_PERIOD);
     }
+
+    return implode(';', $execExpressions);
 }
 
 /**
  * Intended for php scripts executed in command line. The script will stop 
  * here and the "inspect" shell will be started.
+ * 
+ * Note: Variable can't be changed in the inspector if using this function.
  */
 function __dbg_and_inspect($vars) {
     $backTrace = debug_backtrace();
