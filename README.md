@@ -8,12 +8,12 @@ Installation
 
 Clone from the github repo. 
 
-Edit your **/etc/php/php5/php.ini** and/or **/etc/php5/cli/php.ini** files and add the yamd folder to the **include_path** variable.
+Edit your **/etc/php/php5/php.ini** and/or **/etc/php5/cli/php.ini** files and add the yapd folder to the **include_path** variable.
 
 Debugging CLI scripts:
 ----------------------
 
-Go to the cloned folder, start **./inspect.php**. YAMD will start and wait for a debug event.
+Go to the cloned folder, start **./inspect.php**. YAPD will start and wait for a debug event.
 
 Create a new PHP script. Include YAPD:
 
@@ -23,7 +23,7 @@ Insert your debug points with:
 
     __dbg(get_defined_vars();
 
-Start the script, the **inspect.php** (we have started it earlier) process should now look like:
+The **inspect.php** process (we have started it earlier) should now look like:
 
     $ ./inspect.php 
     Waiting for debug...
