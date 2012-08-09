@@ -102,12 +102,16 @@ Type **p** if you want to evaluate variables or simple PHP expressions:
     ? p sqrt($a)
         = 1
 
-Type **s** to see the actual stack trace of this debug point:
+Type **b** to see the actual backtrace of this debug point:
 
     ? s
         /home/puzz/projects/yapd/test_dbg.php(15):
         function: test
         /home/puzz/projects/yapd/test_dbg.php(15):
+
+Type **s** to change the variable value. In order for this to work you must set the debug with **eval(__dbg(get_defined_vars()))**. The value change will take place after you continue the execution with **c**. For example to set the variable $i to 100, type:
+
+    ? s $i 100
 
 Or just **c** to continue to the next debug point.
 
