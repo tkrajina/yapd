@@ -212,7 +212,7 @@ function __inspect() {
  * (executed from command line) should be invoked with __inspect (see 
  * inspect.php).
  * 
- * Note, if you want to shange variable values you must use it like:
+ * Note, if you want to change variable values you must use it like:
  * eval(__dbg(get_defined_vars())).
  */
 function __dbg($vars, $extended=null) {

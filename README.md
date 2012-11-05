@@ -8,7 +8,7 @@ Installation
 
 Clone from the github repo. 
 
-Edit your **/etc/php/php5/php.ini** and/or **/etc/php5/cli/php.ini** files and add the yapd folder to the **include_path** variable.
+Edit your **/etc/php5/apache2/php.ini** and/or **/etc/php5/cli/php.ini** files and add the yapd folder to the **include_path** variable.
 
 Debugging CLI scripts:
 ----------------------
